@@ -12,7 +12,7 @@ def load_data():
 
 df = load_data()
 
-st.title("🎈 Streamlit YouTube Channel Dashboard")
+st.title("Streamlit YouTube Channel Dashboard")
 
 logo_icon = "images/streamlit-mark-color.png"
 logo_image = "images/streamlit-logo-primary-colormark-lighttext.png"
