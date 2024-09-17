@@ -4,7 +4,13 @@ import pandas as pd
 # Set page config
 st.set_page_config(page_title="Streamlit YouTube Channel Dashboard", layout="wide")
 
-df = pd.read_csv("youtube_channel_data.csv")
+def load_data():
+    data = pd.read_csv("youtube_channel_data.csv")
+    data['DATE'] = pd.to_datetime(data['DATE'])
+    data['NET_SUBSCRIBERS'] = data['SUBSCRIBERS_GAINED'] - data['SUBSCRIBERS_LOST']
+    return df
+
+df = load_data()
 
 st.title("🎈 Streamlit YouTube Channel Dashboard")
 
@@ -18,3 +24,5 @@ with st.sidebar:
         ("Daily", "Cumulative"),
     )
 
+with st.expander("See DataFrame"):
+    st.dataframe(df)
