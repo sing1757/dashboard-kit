@@ -16,7 +16,7 @@ st.title("🎈 Streamlit YouTube Channel Dashboard")
 
 logo_icon = "images/streamlit-mark-color.png"
 logo_image = "images/streamlit-logo-primary-colormark-lighttext.png"
-st.logo(icon_image=logo_icon, image=logo_image)
+st.logo(icon_image=logo_icon, image=None)
 
 with st.sidebar:
     st.header("⚙️ Settings")
