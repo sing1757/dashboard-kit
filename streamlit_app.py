@@ -12,6 +12,20 @@ def load_data():
 
 df = load_data()
 
+# Original
+df1 = df[['DATE_DAY', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']]
+
+# Calculate row-wise cumulative sum
+df2 = pd.concat([new_row, df[['DATE_DAY', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']] ], ignore_index=True)
+
+col_name = ['NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']
+for column in col_name:
+    df2[column] = df2[column].cumsum()
+
+def format_with_commas(number):
+    return f"{number:,}"
+    
+
 st.title("Streamlit YouTube Channel Dashboard")
 
 logo_icon = "images/streamlit-mark-color.png"
@@ -27,6 +41,61 @@ with st.sidebar:
         "Select time frame",
         ("Daily", "Cumulative"),
     )
+
+# Display key metrics (Total)
+st.subheader("Key Metrics")
+
+st.caption("All-Time Statistics")
+
+
+col = st.columns(4)
+with col[0]:
+    with st.container(border=True):
+        st.metric("Total Subscribers", format_with_commas((df['SUBSCRIBERS_GAINED'].sum() - df['SUBSCRIBERS_LOST'].sum()) + pre_total_subscribers))
+        if time_frame == 'Daily':
+            df_subscribers = df1[["DATE", "NET_SUBSCRIBERS"]].set_index(df1.columns[0])
+            st.area_chart(df_subscribers, color='#29b5e8', height=150)
+            
+        if time_frame == 'Cumulative':
+            df_subscribers = df2[["DATE", "NET_SUBSCRIBERS"]].set_index(df2.columns[0])
+            st.area_chart(df_subscribers, color='#29b5e8', height=150)
+
+with col[1]:
+    with st.container(border=True):
+        st.metric("Total Views", format_with_commas(df['VIEWS'].sum() + pre_total_views))
+
+        if time_frame == 'Daily':
+            df_views = df1[["DATE", "VIEWS"]].set_index(df1.columns[0])
+            st.area_chart(df_views, color='#FF9F36', height=150)
+
+        if time_frame == 'Cumulative':
+            df_views = df2[["DATE", "VIEWS"]].set_index(df2.columns[0])
+            st.area_chart(df_views, color='#FF9F36', height=150)
+
+with col[2]:
+    with st.container(border=True):
+        st.metric("Total Watch Hours", format_with_commas((round(df['WATCH_TIME_MINUTES'].sum() / 60, 1)) + pre_total_watch_hours))
+
+        if time_frame == 'Daily':
+            df_views = df1[["DATE", "WATCH_HOURS"]].set_index(df1.columns[0])
+            st.area_chart(df_views, color='#D45B90', height=150)
+
+        if time_frame == 'Cumulative':
+            df_views = df2[["DATE", "WATCH_HOURS"]].set_index(df2.columns[0])
+            st.area_chart(df_views, color='#D45B90', height=150)
+        
+with col[3]:
+    with st.container(border=True):
+        st.metric("Total Likes", format_with_commas(df['LIKES'].sum() + pre_total_likes))
+
+        if time_frame == 'Daily':
+            df_views = df1[["DATE", "LIKES"]].set_index(df1.columns[0])
+            st.area_chart(df_views, color='#7D44CF', height=150)
+            
+        if time_frame == 'Cumulative':
+            df_views = df2[["DATE", "LIKES"]].set_index(df2.columns[0])
+            st.area_chart(df_views, color='#7D44CF', height=150)
+
 
 with st.expander("See DataFrame"):
     st.dataframe(df)
