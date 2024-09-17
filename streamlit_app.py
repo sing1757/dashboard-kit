@@ -74,7 +74,7 @@ with col[1]:
 
 with col[2]:
     with st.container(border=True):
-        st.metric("Total Watch Hours", format_with_commas((round(df['WATCH_TIME_MINUTES'].sum() / 60, 1))))
+        st.metric("Total Watch Hours", format_with_commas((df['WATCH_HOURS'].sum())))
 
         if time_frame == 'Daily':
             df_views = df1[["DATE", "WATCH_HOURS"]].set_index(df1.columns[0])
