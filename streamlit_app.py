@@ -8,7 +8,7 @@ def load_data():
     data = pd.read_csv("youtube_channel_data.csv")
     data['DATE'] = pd.to_datetime(data['DATE'])
     data['NET_SUBSCRIBERS'] = data['SUBSCRIBERS_GAINED'] - data['SUBSCRIBERS_LOST']
-    return df
+    return data
 
 df = load_data()
 
