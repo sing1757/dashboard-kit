@@ -42,6 +42,7 @@ with st.sidebar:
         ("Daily", "Cumulative"),
     )
 
+
 # Display key metrics (Total)
 st.subheader("Key Metrics")
 
@@ -95,6 +96,47 @@ with col[3]:
         if time_frame == 'Cumulative':
             df_views = df2[["DATE", "LIKES"]].set_index(df2.columns[0])
             st.area_chart(df_views, color='#7D44CF', height=150)
+
+
+# Display key metrics (Selected Duration)
+st.caption("Selected Duration")
+
+if time_frame == 'Daily':
+    mask = (df1['DATE'].dt.date >= start_date) & (df1['DATE'].dt.date <= end_date)
+    filtered_df = df1.loc[mask]
+    
+if time_frame == 'Cumulative':
+    mask = (df2['DATE'].dt.date >= start_date) & (df2['DATE'].dt.date <= end_date)
+    filtered_df = df2.loc[mask]
+
+cols = st.columns(4)
+with cols[0]:
+    with st.container(border=True):
+        st.metric("Subscribers", format_with_commas(filtered_df['NET_SUBSCRIBERS'].sum()))
+
+        df_subscribers_duration = filtered_df[["DATE", "NET_SUBSCRIBERS"]].set_index(filtered_df.columns[0])
+        st.area_chart(df_subscribers_duration, color='#7D44CF', height=150)
+
+with cols[1]:
+    with st.container(border=True):
+        st.metric("Views", format_with_commas(filtered_df['VIEWS'].sum()))
+
+        df_views_duration = filtered_df[["DATE", "VIEWS"]].set_index(filtered_df.columns[0])
+        st.area_chart(df_views_duration, color='#D45B90', height=150)
+
+with cols[2]:
+    with st.container(border=True):
+        st.metric("Watch Hours", format_with_commas(round(filtered_df['WATCH_HOURS'].sum(), 2)))
+
+        df_watch_hours_duration = filtered_df[["DATE", "WATCH_HOURS"]].set_index(filtered_df.columns[0])
+        st.area_chart(df_watch_hours_duration, color='#FF9F36', height=150)
+
+with cols[3]:
+    with st.container(border=True):
+        st.metric("Likes", format_with_commas(filtered_df['LIKES'].sum()))
+
+        df_likes_duration = filtered_df[["DATE", "LIKES"]].set_index(filtered_df.columns[0])
+        st.area_chart(df_likes_duration, color='#29b5e8', height=150)
 
 
 with st.expander("See DataFrame"):
