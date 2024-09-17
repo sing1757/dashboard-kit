@@ -18,8 +18,7 @@ df1 = df[['DATE', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']]
 # Calculate row-wise cumulative sum
 df2 = df1.copy()
 
-col_name = ['NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']
-for column in col_name:
+for column in ['NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']:
     df2[column] = df2[column].cumsum()
 
 def format_with_commas(number):
