@@ -14,6 +14,10 @@ df = load_data()
 
 st.title("🎈 Streamlit YouTube Channel Dashboard")
 
+logo_icon = "images/streamlit-mark-color.png"
+logo_image = "images/streamlit-logo-primary-colormark-lighttext.png"
+st.logo(icon_image=logo_icon, image=logo_image)
+
 with st.sidebar:
     st.header("⚙️ Settings")
     start_date = st.date_input("Start date", df['DATE'].min())
