@@ -10,8 +10,8 @@ st.title("🎈 Streamlit YouTube Channel Dashboard")
 
 with st.sidebar:
     st.header("⚙️ Settings")
-    start_date = st.date_input("Start date", df['DATE_DAY'].min())
-    end_date = st.date_input("End date", df['DATE_DAY'].max())
+    start_date = st.date_input("Start date", df['DATE'].min())
+    end_date = st.date_input("End date", df['DATE'].max())
 
     time_frame = st.selectbox(
         "Select time frame",
