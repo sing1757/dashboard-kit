@@ -74,7 +74,7 @@ with col[1]:
 
 with col[2]:
     with st.container(border=True):
-        st.metric("Total Watch Hours", format_with_commas((round(df['WATCH_TIME_MINUTES'].sum() / 60, 1)) + pre_total_watch_hours))
+        st.metric("Total Watch Hours", format_with_commas((round(df['WATCH_TIME_MINUTES'].sum() / 60, 1))))
 
         if time_frame == 'Daily':
             df_views = df1[["DATE", "WATCH_HOURS"]].set_index(df1.columns[0])
@@ -86,7 +86,7 @@ with col[2]:
         
 with col[3]:
     with st.container(border=True):
-        st.metric("Total Likes", format_with_commas(df['LIKES'].sum() + pre_total_likes))
+        st.metric("Total Likes", format_with_commas(df['LIKES'].sum()))
 
         if time_frame == 'Daily':
             df_views = df1[["DATE", "LIKES"]].set_index(df1.columns[0])
