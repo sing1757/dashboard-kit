@@ -13,10 +13,10 @@ def load_data():
 df = load_data()
 
 # Original
-df1 = df[['DATE_DAY', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']]
+df1 = df[['DATE', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']]
 
 # Calculate row-wise cumulative sum
-df2 = pd.concat([new_row, df[['DATE_DAY', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']] ], ignore_index=True)
+df2 = pd.concat([new_row, df[['DATE', 'NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']] ], ignore_index=True)
 
 col_name = ['NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']
 for column in col_name:
