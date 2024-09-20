@@ -74,7 +74,7 @@ with st.sidebar:
 
     time_frame = st.selectbox(
         "Select time frame",
-        ("Daily", "Weekly", "Monthly", "Quarterly", "Cumulative"),
+        ("Daily", "Weekly", "Monthly", "Quarterly"),
     )
 
 # Prepare data based on selected time frame
@@ -86,10 +86,6 @@ elif time_frame == 'Monthly':
     df_display = get_monthly_data(df)
 elif time_frame == 'Quarterly':
     df_display = get_quarterly_data(df)
-elif time_frame == 'Cumulative':
-    df_display = pd.concat([df_pre, df], ignore_index=True)
-    for column in ['NET_SUBSCRIBERS', 'VIEWS', 'WATCH_HOURS', 'LIKES']:
-        df_display[column] = df_display[column].cumsum()
 
 # Key Metrics
 st.subheader("Key Metrics")
