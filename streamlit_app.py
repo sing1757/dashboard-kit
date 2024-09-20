@@ -20,7 +20,6 @@ def aggregate_data(df, freq):
         'LIKES': 'sum',
         'COMMENTS': 'sum',
         'SHARES': 'sum',
-        'AVERAGE_VIEW_DURATION_PERCENTAGE': 'mean'
     }).reset_index()
     return df_agg
 
