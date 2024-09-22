@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 from datetime import timedelta, datetime
 
 # Set page config
@@ -63,7 +64,14 @@ def create_metric_chart(df, column, color, height=200, time_frame='Daily'):
     chart_data = df[[column]].copy()
     if time_frame == 'Quarterly':
         chart_data.index = chart_data.index.strftime('Q%q %Y')
-    st.bar_chart(chart_data, y=column, color=color, height=height)
+    
+    fig = go.Figure(data=[go.Bar(x=chart_data.index, y=chart_data[column], marker_color=color)])
+    fig.update_layout(
+        height=height,
+        margin=dict(l=0, r=0, t=0, b=0),
+        xaxis=dict(tickangle=90)
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 def is_period_complete(date, freq):
     today = datetime.now()
@@ -78,10 +86,31 @@ def is_period_complete(date, freq):
         current_quarter = custom_quarter(today)
         return date < current_quarter
 
-def display_metric(col, title, value, df, column, color, time_frame):
+def get_previous_period(df, time_frame):
+    if time_frame == 'Daily':
+        return df.iloc[-2]
+    elif time_frame == 'Weekly':
+        return df.iloc[-2]
+    elif time_frame == 'Monthly':
+        return df.iloc[-2]
+    elif time_frame == 'Quarterly':
+        return df.iloc[-2]
+
+def display_metric(col, title, df, column, color, time_frame):
     with col:
         with st.container(border=True):
-            st.metric(title, format_with_commas(value))
+            current_value = df[column].iloc[-1]
+            previous_value = get_previous_period(df, time_frame)[column]
+            delta = current_value - previous_value
+            delta_percent = (delta / previous_value) * 100 if previous_value != 0 else 0
+            
+            st.metric(
+                title,
+                format_with_commas(current_value),
+                delta=f"{delta:+,.0f} ({delta_percent:+.2f}%)",
+                delta_color="normal"
+            )
+            
             create_metric_chart(df, column, color, time_frame=time_frame)
             
             last_period = df.index[-1]
@@ -131,8 +160,7 @@ metrics = [
 
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
-    total_value = df[column].sum()
-    display_metric(col, title, total_value, df_display, column, color, time_frame)
+    display_metric(col, title, df_display, column, color, time_frame)
 
 # Selected Duration Metrics
 st.caption("Selected Duration")
@@ -146,7 +174,7 @@ df_filtered = df_display.loc[mask]
 
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
-    display_metric(col, title.split()[-1], df_filtered[column].sum(), df_filtered, column, color, time_frame)
+    display_metric(col, title.split()[-1], df_filtered, column, color, time_frame)
 
 # DataFrame display
 with st.expander('See DataFrame'):
