@@ -30,16 +30,35 @@ def get_monthly_data(df):
     return aggregate_data(df, 'M')
 
 def get_quarterly_data(df):
-    return aggregate_data(df, 'Q')
+    df_monthly = df.resample('M', on='DATE').agg({
+        'VIEWS': 'sum',
+        'WATCH_HOURS': 'sum',
+        'NET_SUBSCRIBERS': 'sum',
+        'LIKES': 'sum',
+        'COMMENTS': 'sum',
+        'SHARES': 'sum',
+    }).reset_index()
+    
+    df_monthly['QUARTER'] = df_monthly['DATE'].dt.to_period('Q')
+    df_monthly['MONTH'] = df_monthly['DATE'].dt.strftime('%b')
+    
+    return df_monthly
 
-def load_pre_data():
-    return pd.DataFrame({
-        "DATE": pd.to_datetime(['2024-02-11 00:00:00']),
-        "NET_SUBSCRIBERS": 12861,
-        "VIEWS": 604780,
-        "WATCH_HOURS": 24934.2,
-        "LIKES": 9396
-    })
+def display_quarterly_chart(df, metric):
+    st.subheader(f"Quarterly {metric} Chart")
+    
+    current_quarter = pd.Timestamp.now().to_period('Q')
+    df_current = df[df['QUARTER'] == current_quarter]
+    
+    chart_data = df_current[['MONTH', metric]].set_index('MONTH')
+    
+    st.bar_chart(chart_data)
+    
+    st.write(f"Showing data for Q{current_quarter.quarter} {current_quarter.year}")
+    st.write(f"Total {metric} for the quarter: {chart_data[metric].sum():,.0f}")
+    
+    if len(chart_data) < 3:
+        st.write(f"Note: Only {len(chart_data)} month(s) of data available for the current quarter.")
 
 def format_with_commas(number):
     return f"{number:,}"
@@ -56,7 +75,6 @@ def display_metric(col, title, value, df, column, color):
 
 # Load data
 df = load_data()
-df_pre = load_pre_data()
 
 # Set up the dashboard
 st.title("🎈 Streamlit YouTube Channel Dashboard")
@@ -68,10 +86,8 @@ with st.sidebar:
     max_date = df['DATE'].max().date()
     default_start_date = max_date - timedelta(days=27)
     default_end_date = max_date
-
     start_date = st.date_input("Start date", default_start_date, min_value=df['DATE'].min().date(), max_value=max_date)
     end_date = st.date_input("End date", default_end_date, min_value=df['DATE'].min().date(), max_value=max_date)
-
     time_frame = st.selectbox(
         "Select time frame",
         ("Daily", "Weekly", "Monthly", "Quarterly"),
@@ -90,7 +106,6 @@ elif time_frame == 'Quarterly':
 # Key Metrics
 st.subheader("Key Metrics")
 st.caption("All-Time Statistics")
-
 metrics = [
     ("Total Subscribers", "NET_SUBSCRIBERS", '#29b5e8'),
     ("Total Views", "VIEWS", '#FF9F36'),
@@ -100,18 +115,25 @@ metrics = [
 
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
-    total_value = df[column].sum() + df_pre[column].iloc[0]
+    total_value = df[column].sum()
     display_metric(col, title, total_value, df_display, column, color)
 
 # Selected Duration Metrics
 st.caption("Selected Duration")
-
 mask = (df_display['DATE'].dt.date >= start_date) & (df_display['DATE'].dt.date <= end_date)
 df_filtered = df_display.loc[mask]
 
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
     display_metric(col, title.split()[-1], df_filtered[column].sum(), df_filtered, column, color)
+
+# Quarterly Chart (if Quarterly is selected)
+if time_frame == 'Quarterly':
+    metric_to_display = st.selectbox(
+        "Select metric for quarterly chart",
+        ("VIEWS", "WATCH_HOURS", "NET_SUBSCRIBERS", "LIKES", "COMMENTS", "SHARES")
+    )
+    display_quarterly_chart(df_display, metric_to_display)
 
 # DataFrame display
 with st.expander('See DataFrame'):
