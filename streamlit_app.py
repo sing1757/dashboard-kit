@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Set page config
 st.set_page_config(page_title="Streamlit YouTube Channel Dashboard", layout="wide")
@@ -30,42 +30,37 @@ def get_monthly_data(df):
     return aggregate_data(df, 'M')
 
 def get_quarterly_data(df):
-    df_monthly = df.resample('M', on='DATE').agg({
-        'VIEWS': 'sum',
-        'WATCH_HOURS': 'sum',
-        'NET_SUBSCRIBERS': 'sum',
-        'LIKES': 'sum',
-        'COMMENTS': 'sum',
-        'SHARES': 'sum',
-    }).reset_index()
-    
-    df_monthly['QUARTER'] = df_monthly['DATE'].dt.to_period('Q')
-    df_monthly['MONTH'] = df_monthly['DATE'].dt.strftime('%b')
-    
-    return df_monthly
+    return aggregate_data(df, 'Q')
 
 def format_with_commas(number):
     return f"{number:,}"
 
-def create_metric_chart(df, column, color, height=150, chart_type='area'):
-    if chart_type == 'area':
-        return st.area_chart(df, y=column, color=color, height=height)
-    elif chart_type == 'bar':
-        return st.bar_chart(df, y=column, color=color, height=height)
+def create_metric_chart(df, column, color, height=200):
+    st.bar_chart(df, y=column, color=color, height=height)
+
+def is_period_complete(date, freq):
+    today = datetime.now()
+    if freq == 'D':
+        return date.date() < today.date()
+    elif freq == 'W':
+        return date + timedelta(days=6) < today
+    elif freq == 'M':
+        next_month = date.replace(day=28) + timedelta(days=4)
+        return next_month.replace(day=1) <= today
+    elif freq == 'Q':
+        next_quarter = (date.replace(day=1) + pd.offsets.QuarterEnd()).to_pydatetime()
+        return next_quarter <= today
 
 def display_metric(col, title, value, df, column, color, time_frame):
     with col:
         with st.container(border=True):
             st.metric(title, format_with_commas(value))
-            if time_frame == 'Quarterly':
-                current_quarter = pd.Timestamp.now().to_period('Q')
-                df_current = df[df['QUARTER'] == current_quarter]
-                chart_data = df_current[['MONTH', column]].set_index('MONTH')
-                create_metric_chart(chart_data, column, color, height=200, chart_type='bar')
-                if len(chart_data) < 3:
-                    st.caption(f"Note: Only {len(chart_data)} month(s) of data available for the current quarter.")
-            else:
-                create_metric_chart(df, column, color)
+            create_metric_chart(df, column, color)
+            
+            last_period = df.iloc[-1]['DATE']
+            freq = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M', 'Quarterly': 'Q'}[time_frame]
+            if not is_period_complete(last_period, freq):
+                st.caption(f"Note: The last {time_frame.lower()[:-2] if time_frame != 'Daily' else 'day'} is incomplete.")
 
 # Load data
 df = load_data()
