@@ -20,7 +20,7 @@ def aggregate_data(df, freq):
         'LIKES': 'sum',
         'COMMENTS': 'sum',
         'SHARES': 'sum',
-    }).reset_index()
+    })
     return df_agg
 
 def get_weekly_data(df):
@@ -36,7 +36,10 @@ def format_with_commas(number):
     return f"{number:,}"
 
 def create_metric_chart(df, column, color, height=200):
-    st.bar_chart(df, y=column, color=color, height=height)
+    chart_data = df[[column]].copy()
+    if isinstance(chart_data.index, pd.PeriodIndex):
+        chart_data.index = chart_data.index.to_timestamp()
+    st.bar_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
     today = datetime.now()
@@ -48,7 +51,7 @@ def is_period_complete(date, freq):
         next_month = date.replace(day=28) + timedelta(days=4)
         return next_month.replace(day=1) <= today
     elif freq == 'Q':
-        next_quarter = (date.replace(day=1) + pd.offsets.QuarterEnd()).to_pydatetime()
+        next_quarter = (date + pd.offsets.QuarterEnd()).to_pydatetime()
         return next_quarter <= today
 
 def display_metric(col, title, value, df, column, color, time_frame):
@@ -57,7 +60,7 @@ def display_metric(col, title, value, df, column, color, time_frame):
             st.metric(title, format_with_commas(value))
             create_metric_chart(df, column, color)
             
-            last_period = df.iloc[-1]['DATE']
+            last_period = df.index[-1]
             freq = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M', 'Quarterly': 'Q'}[time_frame]
             if not is_period_complete(last_period, freq):
                 st.caption(f"Note: The last {time_frame.lower()[:-2] if time_frame != 'Daily' else 'day'} is incomplete.")
@@ -84,7 +87,7 @@ with st.sidebar:
 
 # Prepare data based on selected time frame
 if time_frame == 'Daily':
-    df_display = df
+    df_display = df.set_index('DATE')
 elif time_frame == 'Weekly':
     df_display = get_weekly_data(df)
 elif time_frame == 'Monthly':
@@ -109,7 +112,7 @@ for col, (title, column, color) in zip(cols, metrics):
 
 # Selected Duration Metrics
 st.caption("Selected Duration")
-mask = (df_display['DATE'].dt.date >= start_date) & (df_display['DATE'].dt.date <= end_date)
+mask = (df_display.index >= pd.Timestamp(start_date)) & (df_display.index <= pd.Timestamp(end_date))
 df_filtered = df_display.loc[mask]
 
 cols = st.columns(4)
