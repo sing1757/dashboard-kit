@@ -48,11 +48,10 @@ def format_with_commas(number):
     return f"{number:,}"
 
 def create_metric_chart(df, column, color, height=150, chart_type='area'):
-    chart_df = df[["DATE", column]].set_index("DATE")
     if chart_type == 'area':
-        return st.area_chart(chart_df, color=color, height=height)
+        return st.area_chart(df, y=column, color=color, height=height)
     elif chart_type == 'bar':
-        return st.bar_chart(chart_df, color=color, height=height)
+        return st.bar_chart(df, y=column, color=color, height=height)
 
 def display_metric(col, title, value, df, column, color):
     with col:
@@ -66,7 +65,7 @@ def display_quarterly_chart(df, metric):
     current_quarter = pd.Timestamp.now().to_period('Q')
     df_current = df[df['QUARTER'] == current_quarter]
     
-    chart_data = df_current[['DATE', metric]].set_index('DATE')
+    chart_data = df_current[['MONTH', metric]].set_index('MONTH')
     
     create_metric_chart(chart_data, metric, color='#1f77b4', height=300, chart_type='bar')
     
