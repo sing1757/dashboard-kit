@@ -30,15 +30,22 @@ def get_monthly_data(df):
     return aggregate_data(df, 'M')
 
 def get_quarterly_data(df):
-    return aggregate_data(df, 'Q')
+    df_quarterly = aggregate_data(df, 'Q')
+    df_quarterly.index = df_quarterly.index.strftime('Q%q %Y')
+    return df_quarterly
 
 def format_with_commas(number):
     return f"{number:,}"
 
-def create_metric_chart(df, column, color, height=200):
+def create_metric_chart(df, column, color, height=200, time_frame='Daily'):
     chart_data = df[[column]].copy()
-    if isinstance(chart_data.index, pd.PeriodIndex):
+    
+    if time_frame == 'Quarterly':
+        # For quarterly data, use the index as is (already formatted)
+        pass
+    elif isinstance(chart_data.index, pd.PeriodIndex):
         chart_data.index = chart_data.index.to_timestamp()
+    
     st.bar_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
@@ -51,17 +58,19 @@ def is_period_complete(date, freq):
         next_month = date.replace(day=28) + timedelta(days=4)
         return next_month.replace(day=1) <= today
     elif freq == 'Q':
-        next_quarter = (date + pd.offsets.QuarterEnd()).to_pydatetime()
+        next_quarter = (pd.Period(date, freq='Q') + 1).start_time
         return next_quarter <= today
 
 def display_metric(col, title, value, df, column, color, time_frame):
     with col:
         with st.container(border=True):
             st.metric(title, format_with_commas(value))
-            create_metric_chart(df, column, color)
+            create_metric_chart(df, column, color, time_frame=time_frame)
             
             last_period = df.index[-1]
             freq = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M', 'Quarterly': 'Q'}[time_frame]
+            if time_frame == 'Quarterly':
+                last_period = pd.Period(last_period.split()[-1] + last_period.split()[0])
             if not is_period_complete(last_period, freq):
                 st.caption(f"Note: The last {time_frame.lower()[:-2] if time_frame != 'Daily' else 'day'} is incomplete.")
 
@@ -76,7 +85,7 @@ with st.sidebar:
     st.header("⚙️ Settings")
     
     max_date = df['DATE'].max().date()
-    default_start_date = max_date - timedelta(days=27)
+    default_start_date = max_date - timedelta(days=365)  # Changed to show a year by default
     default_end_date = max_date
     start_date = st.date_input("Start date", default_start_date, min_value=df['DATE'].min().date(), max_value=max_date)
     end_date = st.date_input("End date", default_end_date, min_value=df['DATE'].min().date(), max_value=max_date)
@@ -112,7 +121,12 @@ for col, (title, column, color) in zip(cols, metrics):
 
 # Selected Duration Metrics
 st.caption("Selected Duration")
-mask = (df_display.index >= pd.Timestamp(start_date)) & (df_display.index <= pd.Timestamp(end_date))
+if time_frame == 'Quarterly':
+    start_quarter = pd.Period(start_date, freq='Q').strftime('Q%q %Y')
+    end_quarter = pd.Period(end_date, freq='Q').strftime('Q%q %Y')
+    mask = (df_display.index >= start_quarter) & (df_display.index <= end_quarter)
+else:
+    mask = (df_display.index >= pd.Timestamp(start_date)) & (df_display.index <= pd.Timestamp(end_date))
 df_filtered = df_display.loc[mask]
 
 cols = st.columns(4)
