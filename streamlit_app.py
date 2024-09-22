@@ -32,7 +32,6 @@ def get_monthly_data(df):
 def get_quarterly_data(df):
     df_quarterly = aggregate_data(df, 'Q')
     df_quarterly.index = df_quarterly.index.to_period('Q')
-    df_quarterly.index = df_quarterly.index.strftime('Q%q %Y')
     return df_quarterly
 
 def format_with_commas(number):
@@ -40,6 +39,8 @@ def format_with_commas(number):
 
 def create_metric_chart(df, column, color, height=200, time_frame='Daily'):
     chart_data = df[[column]].copy()
+    if time_frame == 'Quarterly':
+        chart_data.index = chart_data.index.astype(str)
     st.bar_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
@@ -63,8 +64,6 @@ def display_metric(col, title, value, df, column, color, time_frame):
             
             last_period = df.index[-1]
             freq = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M', 'Quarterly': 'Q'}[time_frame]
-            if time_frame == 'Quarterly':
-                last_period = pd.Period(last_period)
             if not is_period_complete(last_period, freq):
                 st.caption(f"Note: The last {time_frame.lower()[:-2] if time_frame != 'Daily' else 'day'} is incomplete.")
 
@@ -116,8 +115,8 @@ for col, (title, column, color) in zip(cols, metrics):
 # Selected Duration Metrics
 st.caption("Selected Duration")
 if time_frame == 'Quarterly':
-    start_quarter = pd.Period(start_date, freq='Q').strftime('Q%q %Y')
-    end_quarter = pd.Period(end_date, freq='Q').strftime('Q%q %Y')
+    start_quarter = pd.Period(start_date, freq='Q')
+    end_quarter = pd.Period(end_date, freq='Q')
     mask = (df_display.index >= start_quarter) & (df_display.index <= end_quarter)
 else:
     mask = (df_display.index >= pd.Timestamp(start_date)) & (df_display.index <= pd.Timestamp(end_date))
