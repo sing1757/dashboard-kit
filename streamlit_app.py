@@ -12,16 +12,40 @@ def load_data():
     data['NET_SUBSCRIBERS'] = data['SUBSCRIBERS_GAINED'] - data['SUBSCRIBERS_LOST']
     return data
 
+def custom_quarter(date):
+    month = date.month
+    year = date.year
+    if month in [2, 3, 4]:
+        return pd.Period(year=year, quarter=1, freq='Q')
+    elif month in [5, 6, 7]:
+        return pd.Period(year=year, quarter=2, freq='Q')
+    elif month in [8, 9, 10]:
+        return pd.Period(year=year, quarter=3, freq='Q')
+    else:  # month in [11, 12, 1]
+        return pd.Period(year=year if month != 1 else year-1, quarter=4, freq='Q')
+
 def aggregate_data(df, freq):
-    df_agg = df.resample(freq, on='DATE').agg({
-        'VIEWS': 'sum',
-        'WATCH_HOURS': 'sum',
-        'NET_SUBSCRIBERS': 'sum',
-        'LIKES': 'sum',
-        'COMMENTS': 'sum',
-        'SHARES': 'sum',
-    })
-    return df_agg
+    if freq == 'Q':
+        df = df.copy()
+        df['CUSTOM_Q'] = df['DATE'].apply(custom_quarter)
+        df_agg = df.groupby('CUSTOM_Q').agg({
+            'VIEWS': 'sum',
+            'WATCH_HOURS': 'sum',
+            'NET_SUBSCRIBERS': 'sum',
+            'LIKES': 'sum',
+            'COMMENTS': 'sum',
+            'SHARES': 'sum',
+        })
+        return df_agg
+    else:
+        return df.resample(freq, on='DATE').agg({
+            'VIEWS': 'sum',
+            'WATCH_HOURS': 'sum',
+            'NET_SUBSCRIBERS': 'sum',
+            'LIKES': 'sum',
+            'COMMENTS': 'sum',
+            'SHARES': 'sum',
+        })
 
 def get_weekly_data(df):
     return aggregate_data(df, 'W-MON')
@@ -30,9 +54,7 @@ def get_monthly_data(df):
     return aggregate_data(df, 'M')
 
 def get_quarterly_data(df):
-    df_quarterly = aggregate_data(df, 'Q')
-    df_quarterly.index = df_quarterly.index.to_period('Q')
-    return df_quarterly
+    return aggregate_data(df, 'Q')
 
 def format_with_commas(number):
     return f"{number:,}"
@@ -40,7 +62,7 @@ def format_with_commas(number):
 def create_metric_chart(df, column, color, height=200, time_frame='Daily'):
     chart_data = df[[column]].copy()
     if time_frame == 'Quarterly':
-        chart_data.index = chart_data.index.astype(str)
+        chart_data.index = chart_data.index.strftime('Q%q %Y')
     st.bar_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
@@ -53,8 +75,8 @@ def is_period_complete(date, freq):
         next_month = date.replace(day=28) + timedelta(days=4)
         return next_month.replace(day=1) <= today
     elif freq == 'Q':
-        current_quarter = pd.Period(today, freq='Q')
-        return pd.Period(date, freq='Q') < current_quarter
+        current_quarter = custom_quarter(today)
+        return date < current_quarter
 
 def display_metric(col, title, value, df, column, color, time_frame):
     with col:
@@ -115,8 +137,8 @@ for col, (title, column, color) in zip(cols, metrics):
 # Selected Duration Metrics
 st.caption("Selected Duration")
 if time_frame == 'Quarterly':
-    start_quarter = pd.Period(start_date, freq='Q')
-    end_quarter = pd.Period(end_date, freq='Q')
+    start_quarter = custom_quarter(start_date)
+    end_quarter = custom_quarter(end_date)
     mask = (df_display.index >= start_quarter) & (df_display.index <= end_quarter)
 else:
     mask = (df_display.index >= pd.Timestamp(start_date)) & (df_display.index <= pd.Timestamp(end_date))
