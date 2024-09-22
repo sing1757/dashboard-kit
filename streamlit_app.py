@@ -53,27 +53,19 @@ def create_metric_chart(df, column, color, height=150, chart_type='area'):
     elif chart_type == 'bar':
         return st.bar_chart(df, y=column, color=color, height=height)
 
-def display_metric(col, title, value, df, column, color):
+def display_metric(col, title, value, df, column, color, time_frame):
     with col:
         with st.container(border=True):
             st.metric(title, format_with_commas(value))
-            create_metric_chart(df, column, color)
-
-def display_quarterly_chart(df, metric):
-    st.subheader(f"Quarterly {metric} Chart")
-    
-    current_quarter = pd.Timestamp.now().to_period('Q')
-    df_current = df[df['QUARTER'] == current_quarter]
-    
-    chart_data = df_current[['MONTH', metric]].set_index('MONTH')
-    
-    create_metric_chart(chart_data, metric, color='#1f77b4', height=300, chart_type='bar')
-    
-    st.write(f"Showing data for Q{current_quarter.quarter} {current_quarter.year}")
-    st.write(f"Total {metric} for the quarter: {chart_data[metric].sum():,.0f}")
-    
-    if len(chart_data) < 3:
-        st.write(f"Note: Only {len(chart_data)} month(s) of data available for the current quarter.")
+            if time_frame == 'Quarterly':
+                current_quarter = pd.Timestamp.now().to_period('Q')
+                df_current = df[df['QUARTER'] == current_quarter]
+                chart_data = df_current[['MONTH', column]].set_index('MONTH')
+                create_metric_chart(chart_data, column, color, height=200, chart_type='bar')
+                if len(chart_data) < 3:
+                    st.caption(f"Note: Only {len(chart_data)} month(s) of data available for the current quarter.")
+            else:
+                create_metric_chart(df, column, color)
 
 # Load data
 df = load_data()
@@ -118,7 +110,7 @@ metrics = [
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
     total_value = df[column].sum()
-    display_metric(col, title, total_value, df_display, column, color)
+    display_metric(col, title, total_value, df_display, column, color, time_frame)
 
 # Selected Duration Metrics
 st.caption("Selected Duration")
@@ -127,15 +119,7 @@ df_filtered = df_display.loc[mask]
 
 cols = st.columns(4)
 for col, (title, column, color) in zip(cols, metrics):
-    display_metric(col, title.split()[-1], df_filtered[column].sum(), df_filtered, column, color)
-
-# Quarterly Chart (if Quarterly is selected)
-if time_frame == 'Quarterly':
-    metric_to_display = st.selectbox(
-        "Select metric for quarterly chart",
-        ("VIEWS", "WATCH_HOURS", "NET_SUBSCRIBERS", "LIKES", "COMMENTS", "SHARES")
-    )
-    display_quarterly_chart(df_display, metric_to_display)
+    display_metric(col, title.split()[-1], df_filtered[column].sum(), df_filtered, column, color, time_frame)
 
 # DataFrame display
 with st.expander('See DataFrame'):
