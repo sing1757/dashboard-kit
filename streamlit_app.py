@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import timedelta, datetime
 
 # Set page config
-st.set_page_config(page_title="Streamlit YouTube Channel Dashboard", layout="wide")
+st.set_page_config(page_title="YouTube Channel Dashboard", layout="wide")
 
 @st.cache_data
 def load_data():
@@ -104,7 +104,7 @@ def display_metric(col, title, value, df, column, color, time_frame):
 df = load_data()
 
 # Set up the dashboard
-st.title("🎈 Streamlit YouTube Channel Dashboard")
+st.title("YouTube Channel Dashboard")
 
 sidebar_logo = "images/streamlit-logo-primary-colormark-lighttext.png"
 main_body_logo = "images/streamlit-mark-color.png"
