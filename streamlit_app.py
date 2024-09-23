@@ -163,5 +163,5 @@ for col, (title, column, color) in zip(cols, metrics):
     display_metric(col, title.split()[-1], df_filtered[column].sum(), df_filtered, column, color, time_frame)
 
 # DataFrame display
-with st.expander('See DataFrame'):
+with st.expander('See DataFrame (Selected time frame)'):
     st.dataframe(df_filtered)
