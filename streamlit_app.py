@@ -133,8 +133,8 @@ elif time_frame == 'Quarterly':
     df_display = get_quarterly_data(df)
 
 # Key Metrics
-st.subheader("Key Metrics")
-st.caption("All-Time Statistics")
+st.subheader("All-Time Statistics")
+# st.caption("All-Time Statistics")
 metrics = [
     ("Total Subscribers", "NET_SUBSCRIBERS", '#29b5e8'),
     ("Total Views", "VIEWS", '#FF9F36'),
@@ -148,7 +148,8 @@ for col, (title, column, color) in zip(cols, metrics):
     display_metric(col, title, total_value, df_display, column, color, time_frame)
 
 # Selected Duration Metrics
-st.caption("Selected Duration")
+st.subheader("Selected Duration")
+# st.caption("Selected Duration")
 if time_frame == 'Quarterly':
     start_quarter = custom_quarter(start_date)
     end_quarter = custom_quarter(end_date)
