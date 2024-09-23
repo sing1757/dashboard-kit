@@ -164,5 +164,4 @@ for col, (title, column, color) in zip(cols, metrics):
 
 # DataFrame display
 with st.expander('See DataFrame'):
-    st.dataframe(df)
-    st.dataframe(df_display)
+    st.dataframe(df_filtered)
