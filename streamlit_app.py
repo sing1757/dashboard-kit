@@ -68,12 +68,7 @@ def format_with_commas(number):
 def create_metric_chart(df, column, color, height=150, time_frame='Daily'):
     chart_data = df[[column]].copy()
     if time_frame == 'Quarterly':
-        # Convert index to datetime for proper sorting
-        chart_data.index = chart_data.index.to_timestamp()
-        # Sort the data chronologically
-        chart_data = chart_data.sort_index()
-        # Format the index as 'YYYY Q#' for display
-        chart_data.index = chart_data.index.strftime('%Y Q%q')
+        chart_data.index = chart_data.index.strftime('%Y Q%q ')
     st.bar_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
