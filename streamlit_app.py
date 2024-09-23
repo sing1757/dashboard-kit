@@ -106,8 +106,8 @@ df = load_data()
 # Set up the dashboard
 st.title("🎈 Streamlit YouTube Channel Dashboard")
 
-sidebar_logo = "images/streamlit-mark-color.png"
-main_body_logo = "images/streamlit-logo-primary-colormark-lighttext.png"
+sidebar_logo = "images/streamlit-logo-primary-colormark-lighttext.png"
+main_body_logo = "images/streamlit-mark-color.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
 # Sidebar
