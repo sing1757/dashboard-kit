@@ -5,6 +5,7 @@ from datetime import timedelta, datetime
 # Set page config
 st.set_page_config(page_title="YouTube Channel Dashboard", layout="wide")
 
+# Helper functions
 @st.cache_data
 def load_data():
     data = pd.read_csv("youtube_channel_data.csv")
@@ -106,7 +107,7 @@ def display_metric(col, title, value, df, column, color, time_frame):
 # Load data
 df = load_data()
 
-# Set up the dashboard
+# Set up input widgets
 sidebar_logo = "images/streamlit-logo-primary-colormark-lighttext.png"
 main_body_logo = "images/streamlit-mark-color.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
@@ -136,7 +137,7 @@ elif time_frame == 'Monthly':
 elif time_frame == 'Quarterly':
     df_display = get_quarterly_data(df)
 
-# Key Metrics
+# Display Key Metrics
 st.subheader("All-Time Statistics")
 
 metrics = [
@@ -151,7 +152,6 @@ for col, (title, column, color) in zip(cols, metrics):
     total_value = df[column].sum()
     display_metric(col, title, total_value, df_display, column, color, time_frame)
 
-# Selected Duration Metrics
 st.subheader("Selected Duration")
 
 if time_frame == 'Quarterly':
