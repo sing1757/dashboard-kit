@@ -96,7 +96,7 @@ def display_metric(col, title, value, df, column, color, time_frame):
             delta, delta_percent = calculate_delta(df, column)
             delta_str = f"{delta:+,.0f} ({delta_percent:+.2f}%)"
             st.metric(title, format_with_commas(value), delta=delta_str)
-            create_metric_chart(df, column, color, time_frame=time_frame)
+            create_metric_chart(df, column, color, time_frame=time_frame, chart_type=chart_selection)
             
             last_period = df.index[-1]
             freq = {'Daily': 'D', 'Weekly': 'W', 'Monthly': 'M', 'Quarterly': 'Q'}[time_frame]
