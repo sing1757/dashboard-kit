@@ -59,17 +59,14 @@ def get_quarterly_data(df):
 def format_with_commas(number):
     return f"{number:,}"
 
-#def create_metric_chart(df, column, color, height=150, time_frame='Daily'):
-    #chart_data = df[[column]].copy()
-    #if time_frame == 'Quarterly':
-        #chart_data.index = chart_data.index.strftime('Q%q %Y')
-    #st.bar_chart(chart_data, y=column, color=color, height=height)
-
-def create_metric_chart(df, column, color, height=150, time_frame='Daily'):
+def create_metric_chart(df, column, color, height=150, time_frame='Daily', chart_type):
     chart_data = df[[column]].copy()
     if time_frame == 'Quarterly':
         chart_data.index = chart_data.index.strftime('%Y Q%q ')
-    st.bar_chart(chart_data, y=column, color=color, height=height)
+    if chart_type=='Bar':
+        st.bar_chart(chart_data, y=column, color=color, height=height)
+    if chart_type=='Area':
+        st.area_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
     today = datetime.now()
@@ -123,10 +120,11 @@ with st.sidebar:
     default_end_date = max_date
     start_date = st.date_input("Start date", default_start_date, min_value=df['DATE'].min().date(), max_value=max_date)
     end_date = st.date_input("End date", default_end_date, min_value=df['DATE'].min().date(), max_value=max_date)
-    time_frame = st.selectbox(
-        "Select time frame",
-        ("Daily", "Weekly", "Monthly", "Quarterly"),
+    time_frame = st.selectbox("Select time frame",
+                              ("Daily", "Weekly", "Monthly", "Quarterly"),
     )
+    chart_selection = st.selectbox("Select a chart type",
+                                   ("Bar", "Area"))
 
 # Prepare data based on selected time frame
 if time_frame == 'Daily':
