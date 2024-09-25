@@ -6,6 +6,14 @@ The app displays various metrics and visualizations to help content creators und
 
 <img src="/images/app-screenshot.png">
 
+## Demo App
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://dashboard-kit.streamlit.app/)
+
+## GitHub Codespaces
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/app-starter-kit?quickstart=1)
+
 ## Features
 
 - Interactive date range selection
@@ -18,13 +26,6 @@ The app displays various metrics and visualizations to help content creators und
 - Option to display bar or area charts
 - Data table view for detailed analysis
 
-## Demo App
-
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://dashboard-kit.streamlit.app/)
-
-## GitHub Codespaces
-
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/app-starter-kit?quickstart=1)
 
 ## Requirements
 - Python 3.9+
