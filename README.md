@@ -9,10 +9,10 @@ The app displays various metrics and visualizations to help content creators und
 - Interactive date range selection
 - Multiple time frame views (Daily, Weekly, Monthly, Quarterly)
 - Key metrics:
-- 1. Total Subscribers
-- 2. Total Views
-3. Total Watch Hours
-4. Total Likes
+  - Total Subscribers
+  - Total Views
+  - Total Watch Hours
+  - Total Likes
 - Option to display bar or area charts
 - Data table view for detailed analysis
 
