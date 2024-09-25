@@ -29,8 +29,8 @@ The app displays various metrics and visualizations to help content creators und
 
 ## Requirements
 - Python 3.9+
-- Streamlit
-- NumPy
-- Pandas
-- datetime
+- `streamlit` - web framework
+- `numpy` - numerical processing
+- `pandas` - data wrangling
+- `datetime` - handling date time
 
