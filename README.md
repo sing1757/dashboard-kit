@@ -1,8 +1,8 @@
 # 📊 Dashboard Kit
 
-This Streamlit dashboard app allows you to analyze a hypothetical YouTube channel data. 
+This Streamlit dashboard app allows you to analyze a hypothetical YouTube channel data and display various metrics and visualizations, which is helpful for content creators in understanding their channel's performance over time.
 
-The app displays various metrics and visualizations to help content creators understand their channel's performance over time.
+The app's UI is built using pure Streamlit.
 
 <img src="/images/app-screenshot.png">
 
