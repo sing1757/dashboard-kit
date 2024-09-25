@@ -4,7 +4,7 @@ This Streamlit dashboard app allows you to analyze a hypothetical YouTube channe
 
 The app displays various metrics and visualizations to help content creators understand their channel's performance over time.
 
-[![](images/app_screenshot.png)]()
+<img src="/images/app-screenshot.png">
 
 ## Features
 
