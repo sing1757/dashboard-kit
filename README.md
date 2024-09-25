@@ -23,3 +23,11 @@ The app displays various metrics and visualizations to help content creators und
 ## GitHub Codespaces
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/app-starter-kit?quickstart=1)
+
+## Requirements
+- Python 3.9+
+- Streamlit
+- NumPy
+- Pandas
+- datetime
+
