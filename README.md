@@ -1,6 +1,6 @@
 # 📊 Dashboard Kit
 
-A simple dashboard building kit using Streamlit.
+A simple dashboard building kit using pure Streamlit.
 
 ## Demo App
 
