@@ -68,6 +68,8 @@ def create_metric_chart(df, column, color, chart_type, height=150, time_frame='D
         st.bar_chart(chart_data, y=column, color=color, height=height)
     if chart_type=='Area':
         st.area_chart(chart_data, y=column, color=color, height=height)
+    if chart_type == 'Line':
+        st.line_chart(chart_data, y=column, color=color, height=height)
 
 def is_period_complete(date, freq):
     today = datetime.now()
